@@ -9,73 +9,113 @@ public class Astar {
     public static List<Node> findPath(Grid grid, Node start, Node goal) {
 
         Long startTime = System.currentTimeMillis();
-        int w=grid.getWidth(); int h=grid.getHeight();
+        int w = grid.getWidth(); 
+        int h = grid.getHeight();
 
-        boolean[][] visited = new boolean[h][w];
+        // Priority queue ordered by f-score
+        PriorityQueue<Node> open = new PriorityQueue<>(
+            (n1, n2) -> Integer.compare(n1.getF(), n2.getF())
+        );
 
-        PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingInt(n -> f(n, goal)));
+        // Track visited nodes and their best g-scores
+        Map<Node, Integer> gScore = new HashMap<>();
+        Map<Node, Integer> fScore = new HashMap<>();
+        Set<Node> closed = new HashSet<>();
 
+        // Initialize start node
+        gScore.put(start, 0);
+        fScore.put(start, h(start, goal));
+        start.setF(fScore.get(start));
         open.add(start);
 
-        while (!open.isEmpty()){
+        Node endNode = null; // will hold the final node on success
+
+        while (!open.isEmpty()) {
 
             Node curr = open.poll();
 
-            int x = curr.getX(); int y = curr.getY();
+            // Skip if already processed
+            if (closed.contains(curr)) continue;
 
-            if (visited[y][x]) continue;
+            int x = curr.getX(); 
+            int y = curr.getY();
 
-            visited[y][x] = true;
-            nodesVisited++;
-            if (grid.getCell(x, y)!=Grid.START && grid.getCell(x, y)!=Grid.GOAL) grid.setCell(x,y,Grid.VISITED);
-
-            if ( (x==goal.getX())&&(y==goal.getY())){
-
-                goal.setParent(curr);
+            // Check if goal reached
+            if (x == goal.getX() && y == goal.getY()) {
+                // record the current node so we can rebuild the path later
+                endNode = curr;
                 break;
             }
 
-            for (Node n:grid.getNeigh(curr)){
+            // Mark as processed
+            closed.add(curr);
+            nodesVisited++;
+            
+            if (grid.getCell(x, y) != Grid.START && grid.getCell(x, y) != Grid.GOAL) {
+                grid.setCell(x, y, Grid.VISITED);
+            }
 
-                int nX = n.getX(); int nY = n.getY();
+            // Explore neighbors
+            for (Node neighbor : grid.getNeigh(curr)) {
 
-                if (!visited[nY][nX]) {
+                if (closed.contains(neighbor)) continue;
 
-                    n.setParent(curr);   
-                    open.add(n);
+                int nX = neighbor.getX(); 
+                int nY = neighbor.getY();
+
+                // Skip obstacles
+                if (grid.getCell(nX, nY) == Grid.OBSTACLE) continue;
+
+                // Calculate tentative g-score (assuming uniform cost of 1 per step)
+                int tentativeG = gScore.get(curr) + 1;
+
+                // If this path is better than any previous path to neighbor
+                if (!gScore.containsKey(neighbor) || tentativeG < gScore.get(neighbor)) {
+
+                    // Update parent and scores
+                    neighbor.setParent(curr);
+                    gScore.put(neighbor, tentativeG);
+                    
+                    int hScore = h(neighbor, goal);
+                    int fScore_val = tentativeG + hScore;
+                    fScore.put(neighbor, fScore_val);
+                    neighbor.setF(fScore_val);
+
+                    // re-insert into open to update priority (remove old instance if present)
+                    open.remove(neighbor);
+                    open.add(neighbor);
                 }
-            }//END_n - neighbours
-        }//END_while
+            }
+        }
 
+        // Reconstruct path
         List<Node> path = new ArrayList<>();
-        Node cur = goal;
+        Node cur = endNode;
 
-        while (cur!=null){
-
+        while (cur != null) {
             path.add(cur);
             cur = cur.getParent();
-        }//END_while
+        }
 
         Collections.reverse(path);
 
-        for (Node n:path){
-
+        // Mark path on grid
+        for (Node n : path) {
+            
             int cell = grid.getCell(n.getX(), n.getY());
-
-            if ( (cell != grid.START )&&(cell !=Grid.GOAL) ) grid.setCell(n.getX(), n.getY(), Grid.PATH);
-        }//END_n - node
-
-        // System.out.println("A* done, pad length= "+path.size());
+            if (cell != Grid.START && cell != Grid.GOAL) {
+                grid.setCell(n.getX(), n.getY(), Grid.PATH);
+            }
+        }
 
         exeTime = System.currentTimeMillis() - startTime;
-
         return path;
     }
 
-    private static int f(Node curr, Node goal) {
+    // private static int f(Node curr, Node goal) {
 
-        return g(curr) + h(curr, goal);
-    }//END_f
+    //     return g(curr) + h(curr, goal);
+    // }//END_f
 
     private static int h(Node curr, Node goal){
 
@@ -84,18 +124,18 @@ public class Astar {
     }//END_h
 
     //Calculate path from curretn node to start node
-    private static int g(Node curr) {
+    // private static int g(Node curr) {
 
-        int iPath = 0;
+    //     int iPath = 0;
 
-        while (curr.getParent()!=null){
+    //     while (curr.getParent()!=null){
 
-            curr = curr.getParent();
-            iPath++;
-        }//END_while
+    //         curr = curr.getParent();
+    //         iPath++;
+    //     }//END_while
 
-        return iPath;
-    }//END_g
+    //     return iPath;
+    // }//END_g
 
     
     public static void stats(List<Node> path) {
