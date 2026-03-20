@@ -201,7 +201,10 @@ public class Grid {
 
             for (int x=0; x<w; x++) {
 
-                if ((grid[y][x]==PATH) || (grid[y][x]==VISITED)) grid[y][x] = EMPTY;
+                if ((grid[y][x]==PATH) || (grid[y][x]==VISITED)){
+
+                  grid[y][x] = EMPTY;  
+                }
             }//END_x
         }//END_y
 

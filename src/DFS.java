@@ -1,78 +1,74 @@
 import java.util.*;
 
 //Recursion
-public class DFS {
+public class DFS extends Algo {
 
+    private long sTime = 0;//Start time
     private static Long exeTime;
     private static int nodesVisited = 0;
 
-    public static List<Node> findPath(Grid grid) {
+    private Node start, goal;
 
-        long startTime = System.currentTimeMillis(); // Start time
+    public List<Node> findPath(Grid grid) {
 
-        int h = grid.getHeight();
-        int w = grid.getWidth();
+        startTimer();
 
-        boolean[][] visited = new boolean[h][w];
+        this.start = grid.getStart(); this.goal = grid.getGoal();
 
-        Node start = grid.getStart();
-        Node goal = grid.getGoal();
 
-        if (dfs(grid, start, goal, visited)) {
-            // reconstruct path via parent pointers
+        Deque<Node> stackOpen = new ArrayDeque<>();
+        List<Node> closed = new List<>();
+        List<Node> path = new List<>();
 
-            List<Node> path = new ArrayList<>();
-            Node cur = goal;
-            while (cur != null) {
-                path.add(cur);
-                cur = cur.getParent();
-            }
+        open.push(start);
 
-            for (Node n : path) {
+        if (dfs(grid, stackOpen, closed)) {
 
-                int cell = grid.getCell(n.getX(), n.getY());
 
-                if (cell != Grid.START && cell != Grid.GOAL) {
-                    grid.setCell(n.getX(), n.getY(), Grid.PATH);
-                }
-            }
 
-            Collections.reverse(path);
 
-            exeTime = System.currentTimeMillis() - startTime;
+            // Collections.reverse(path);
 
-            return path;
-        }
+            stopTimer();
+            // return path;
+        }//END_if
+
         return Collections.emptyList();
-    }
+    }//END_findPath
 
-//Recursive function
-    private static boolean dfs(Grid grid, Node c, Node goal, boolean[][] visited) {
 
-        int x = c.getX(); int y = c.getY();
+    private static boolean dfs(Grid grid, Deque<Node> open, List<Node> closed) {
 
-        // out-of-bounds cells are treated as obstacles by getCell()
-        if (visited[y][x] || grid.getCell(x, y)==Grid.OBSTACLE) { return false; }
+        // // out-of-bounds cells are treated as obstacles by getCell()
+        // if (visited[y][x] || grid.getCell(x, y)==Grid.OBSTACLE) { return false; }
 
-        visited[y][x] = true;
-        nodesVisited++;
-        if (grid.getCell(x, y) != Grid.START && grid.getCell(x,y)!=Grid.GOAL) grid.setCell(x, y, Grid.VISITED);
+        boolean bState = false;
 
-        if (x == goal.getX() && y == goal.getY()) { 
-            
-            goal.setParent(c);
-            return true; 
-        }
+        while ( (!open.isEmpty())&&(bState != true) )  {
 
-        for (Node n : grid.getNeigh(c)) {
+            Node curr = open.pop();//Take top of stack - DFS
 
-            n.setParent(c);
-            if (dfs(grid, n, goal, visited)) {
-                return true;
+            if (curr.equals(grid.getGoal())) {
+
+                bState = true;
+            } else {
+
+                curr.visit();
+                List<Node> children = grid.getNeigh(curr);
+
+                for (Node c : children){ 
+                    
+                    if (!c.getVisisted() && !c.getSeen()){//not visisted and not in open or closed
+
+                        open.push(c);
+                        c.see();
+                    }//END_if
+                    
+                }//END_c
             }
-        }//END_n
+        }//END_while
 
-        return false;
+        return bState;//Default
     }//END_dfs
 
     public static void stats(List<Node> path) {

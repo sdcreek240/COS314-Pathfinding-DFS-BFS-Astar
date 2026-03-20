@@ -8,8 +8,8 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("========================================");
-        System.out.println("    Wall-E Pathfinding Simulator");
-        System.out.println("    DFS vs BFS vs A* Comparison");
+        System.out.println("   | Wall-E Pathfinding Simulator |");
+        System.out.println("   | DFS  |  BFS  | A* Comparison |");
         System.out.println("========================================\n");
 
         System.out.print("Enter seed value for noise: ");
@@ -40,18 +40,18 @@ public class Main {
 
         grid.display();grid.resetSearch();
 
-        //BFS
-        List<Node> BFSpath = BFS.findPath(grid, grid.getStart(), grid.getGoal());
+        // //BFS
+        // List<Node> BFSpath = BFS.findPath(grid, grid.getStart(), grid.getGoal());
 
-        grid.display();grid.resetSearch();
+        // grid.display();grid.resetSearch();
 
-        //Astar
-        List<Node> Apath = Astar.findPath(grid, grid.getStart(), grid.getGoal());
+        // //Astar
+        // List<Node> Apath = Astar.findPath(grid, grid.getStart(), grid.getGoal());
 
-        grid.display();grid.resetSearch();
+        // grid.display();grid.resetSearch();
 
         DFS.stats(DFSpath);
-        BFS.stats(BFSpath);
-        Astar.stats(Apath);
+        // BFS.stats(BFSpath);
+        // Astar.stats(Apath);
     }
 }//END_main
