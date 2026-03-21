@@ -48,12 +48,13 @@ public class Main {
         grid.display();grid.resetSearch();
 
         //Astar
-        List<Node> Apath = Astar.findPath(grid, grid.getStart(), grid.getGoal());
+        Astar a = new Astar();
+        List<Node> Apath = a.findPath(grid);
 
         grid.display();grid.resetSearch();
 
         dfs.stats(DFSpath);
         bfs.stats(BFSpath);
-        Astar.stats(Apath);
+        a.stats(Apath);
     }
 }//END_main
