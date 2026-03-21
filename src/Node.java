@@ -34,7 +34,7 @@ public class Node {
 
         this.x = node.getX(); this.y = node.getY();
         this.parent = node.getParent();
-        this.visited = node.getVisisted();
+        this.visited = node.getVisited();
         this.seen = node.getSeen();
     }//END_copyConstr
 
@@ -45,7 +45,7 @@ public class Node {
     public int getY() { return y; }
     public Node getParent() { return parent; }
 
-    public boolean getVisisted() { return visited; }
+    public boolean getVisited() { return visited; }
     public boolean getSeen() { return seen; }
     public int getF() { return f; }
 
@@ -62,20 +62,11 @@ public class Node {
 
     //
     @Override
-    public boolean equals(Object obj) {
-
-        if (this==obj) return true;
-        if (obj==null || getClass()!=obj.getClass()) return false;  // null or different type
-        Node other = (Node) obj;
-        return (this.X==other.getX()) && (this.Y==other.getY());
-    }
-
-    @Override
     public String toString() { return "("+x+","+y+")"; }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this==o) return true;
         if (!(o instanceof Node)) return false;
         Node node = (Node) o;
         return x == node.x && y == node.y;

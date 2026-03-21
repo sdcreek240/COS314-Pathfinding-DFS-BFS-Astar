@@ -1,64 +1,60 @@
 import java.util.*;
 
-public class BFS {
+public class BFS extends Algo{
 
-    private static Long exeTime;
-    private static int nodesVisited = 0;
+    private boolean[][] arrB;//For keeping track
+    // private Node foundGoal;
 
-    public static List<Node> findPath(Grid grid, Node s, Node goal){
+    public List<Node> findPath(Grid grid){
 
-        Long startTime = System.currentTimeMillis();
-        int width = grid.getWidth();
-        int height = grid.getHeight();
+        startTimer();
 
-        boolean[][] visited = new boolean[height][width];
+        Node s = grid.getStart(); Node goal = grid.getGoal();//get nodes for search
 
-        Queue<Node> queue = new LinkedList<>();
+        List<Node> path = new ArrayList<>();//to return
+        Queue<Node> open = new LinkedList<>();//used queue for FIFOs
 
-        queue.add(s);
-        visited[s.getY()][s.getX()] = true;
+        open.add(s);
 
-        while (!queue.isEmpty()) {
+        arrB = new boolean[grid.getHeight()][grid.getWidth()];
+        arrB[s.getY()][s.getX()] = true;
 
-            Node current = queue.poll();
+        while (!open.isEmpty()) {
+
+            Node current = open.poll();
 
             int x = current.getX(); int y = current.getY();
 
             if (x==goal.getX() && y==goal.getY()) {
 
-                goal.setParent(current);
+                // goal.setParent(current);
+                Node cur = current;
+
+                //Resconstruct path
+                while (cur != null) {
+
+                    path.add(cur);
+                    cur = cur.getParent();
+                }//END_while
+
+                Collections.reverse(path);
                 break;
             }
 
             for (Node neighbour : grid.getNeigh(current)) {
 
-                int nx = neighbour.getX();
-                int ny = neighbour.getY();
+                int nx = neighbour.getX(); int ny = neighbour.getY();
 
-                if (!visited[ny][nx]) {
+                if (!arrB[ny][nx]) {
 
-                    visited[ny][nx] = true;
+                    arrB[ny][nx] = true;
                     nodesVisited++;
-                    if (grid.getCell(nx, ny) != Grid.START && grid.getCell(nx, ny) != Grid.GOAL) {
-                        grid.setCell(nx, ny, Grid.VISITED);
-                    }
+                    if (!grid.isStartOrGoal(nx, ny)) grid.setCell(nx, ny, Grid.VISITED);
 
-                    queue.add(neighbour);
+                    open.add(neighbour);
                 }
             }
-        }
-
-        List<Node> path = new ArrayList<>();
-
-        Node cur = goal;
-
-        while (cur != null) {
-            
-            path.add(cur);
-            cur = cur.getParent();
-        }
-
-        Collections.reverse(path);
+        }//END_while
 
         for (Node n : path) {
 
@@ -71,11 +67,13 @@ public class BFS {
 
         // System.out.println("BFS completed, path length=" + path.size());
 
-        exeTime = System.currentTimeMillis() - startTime;
+        stopTimer();
+        exeTime = getExeTime();
+
         return path;
     }
 
-    public static void stats(List<Node> path) {
+    public void stats(List<Node> path) {
 
         System.out.print("BFS  Path Length= " + path.size());
         System.out.print(" | Nodes visited= " + nodesVisited);

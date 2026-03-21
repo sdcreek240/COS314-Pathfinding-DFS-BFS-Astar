@@ -36,22 +36,24 @@ public class Main {
         System.out.println("END_Initial grid================================================================================");
 
         //DFS
-        List<Node> DFSpath = DFS.findPath(grid);
+        DFS dfs = new DFS();
+        List<Node> DFSpath = dfs.findPath(grid);
+
+        grid.display(); grid.resetSearch();
+
+        //BFS
+        BFS bfs = new BFS();
+        List<Node> BFSpath = bfs.findPath(grid);
 
         grid.display();grid.resetSearch();
 
-        // //BFS
-        // List<Node> BFSpath = BFS.findPath(grid, grid.getStart(), grid.getGoal());
+        //Astar
+        List<Node> Apath = Astar.findPath(grid, grid.getStart(), grid.getGoal());
 
-        // grid.display();grid.resetSearch();
+        grid.display();grid.resetSearch();
 
-        // //Astar
-        // List<Node> Apath = Astar.findPath(grid, grid.getStart(), grid.getGoal());
-
-        // grid.display();grid.resetSearch();
-
-        DFS.stats(DFSpath);
-        // BFS.stats(BFSpath);
-        // Astar.stats(Apath);
+        dfs.stats(DFSpath);
+        bfs.stats(BFSpath);
+        Astar.stats(Apath);
     }
 }//END_main

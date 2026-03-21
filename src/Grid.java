@@ -87,7 +87,7 @@ public class Grid {
         }//END_while
     }//END_addRandNoise
 
-    private boolean isStartOrGoal(int x, int y) {
+    public boolean isStartOrGoal(int x, int y) {
 
         return (x==sNode.getX() && y==sNode.getY()) || (x==gNode.getX() && y==gNode.getY());
     }//END_isStartOrGoal

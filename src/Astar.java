@@ -1,21 +1,18 @@
 import java.util.*;
 import java.lang.Math;
 
-public class Astar {
+public class Astar extends Algo {
 
-    private static Long exeTime;
-    private static int nodesVisited = 0;
 
-    public static List<Node> findPath(Grid grid, Node start, Node goal) {
 
-        Long startTime = System.currentTimeMillis();
-        int w = grid.getWidth(); 
-        int h = grid.getHeight();
+    public List<Node> findPath(Grid grid) {
 
-        // Priority queue ordered by f-score
-        PriorityQueue<Node> open = new PriorityQueue<>(
-            (n1, n2) -> Integer.compare(n1.getF(), n2.getF())
-        );
+        startTimer();
+
+        Node start = grid.getStart(); Node goal = grid.getGoal();
+
+        // priority queue using the f-score f= g + h
+        PriorityQueue<Node> open = new PriorityQueue<>( (n1, n2) -> Integer.compare(n1.getF(), n2.getF()) );
 
         // Track visited nodes and their best g-scores
         Map<Node, Integer> gScore = new HashMap<>();
@@ -23,8 +20,7 @@ public class Astar {
         Set<Node> closed = new HashSet<>();
 
         // Initialize start node
-        gScore.put(start, 0);
-        fScore.put(start, h(start, goal));
+        gScore.put(start, 0); fScore.put(start, h(start, goal));
         start.setF(fScore.get(start));
         open.add(start);
 
@@ -41,19 +37,16 @@ public class Astar {
             int y = curr.getY();
 
             // Check if goal reached
-            if (x == goal.getX() && y == goal.getY()) {
-                // record the current node so we can rebuild the path later
+            if ((x == goal.getX()) && (y == goal.getY())) {
+
                 endNode = curr;
                 break;
-            }
+            }//END_if goal
 
-            // Mark as processed
-            closed.add(curr);
-            nodesVisited++;
+            // Mark as seen
+            closed.add(curr); nodesVisited++;
             
-            if (grid.getCell(x, y) != Grid.START && grid.getCell(x, y) != Grid.GOAL) {
-                grid.setCell(x, y, Grid.VISITED);
-            }
+            if ((grid.getCell(x, y) != Grid.START) && (grid.getCell(x, y) != Grid.GOAL)) grid.setCell(x, y, Grid.VISITED);
 
             // Explore neighbors
             for (Node neighbor : grid.getNeigh(curr)) {
@@ -69,10 +62,8 @@ public class Astar {
                 // Calculate tentative g-score (assuming uniform cost of 1 per step)
                 int tentativeG = gScore.get(curr) + 1;
 
-                // If this path is better than any previous path to neighbor
                 if (!gScore.containsKey(neighbor) || tentativeG < gScore.get(neighbor)) {
 
-                    // Update parent and scores
                     neighbor.setParent(curr);
                     gScore.put(neighbor, tentativeG);
                     
@@ -81,18 +72,17 @@ public class Astar {
                     fScore.put(neighbor, fScore_val);
                     neighbor.setF(fScore_val);
 
-                    // re-insert into open to update priority (remove old instance if present)
-                    open.remove(neighbor);
-                    open.add(neighbor);
-                }
-            }
+                    open.remove(neighbor);  open.add(neighbor);
+                }//END_if
+            }//END_neighbor
         }
 
-        // Reconstruct path
+        // build path
         List<Node> path = new ArrayList<>();
         Node cur = endNode;
 
         while (cur != null) {
+
             path.add(cur);
             cur = cur.getParent();
         }
@@ -102,13 +92,13 @@ public class Astar {
         // Mark path on grid
         for (Node n : path) {
             
-            int cell = grid.getCell(n.getX(), n.getY());
-            if (cell != Grid.START && cell != Grid.GOAL) {
-                grid.setCell(n.getX(), n.getY(), Grid.PATH);
-            }
-        }
+            int c = grid.getCell(n.getX(), n.getY());
+            if ((c != Grid.START) && (c != Grid.GOAL)) grid.setCell(n.getX(), n.getY(), Grid.PATH);
+        }//END_n
 
-        exeTime = System.currentTimeMillis() - startTime;
+        stopTimer();
+        exeTime = getExeTime();
+
         return path;
     }
 
@@ -117,7 +107,7 @@ public class Astar {
     //     return g(curr) + h(curr, goal);
     // }//END_f
 
-    private static int h(Node curr, Node goal){
+    private int h(Node curr, Node goal){
 
         //Manhatten distance 
         return Math.abs(curr.getX() - goal.getX()) + Math.abs(curr.getY() - goal.getY());
@@ -138,7 +128,7 @@ public class Astar {
     // }//END_g
 
     
-    public static void stats(List<Node> path) {
+    public void stats(List<Node> path) {
 
         System.out.print("A*  Path Length= " + path.size());
         System.out.print(" | Nodes visited= " + nodesVisited);
